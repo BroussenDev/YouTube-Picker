@@ -6,6 +6,7 @@
   "host_permissions": ["https://www.youtube.com/*"],
   "action": { "default_popup": "popup.html" },
   "background": { "service_worker": "background.js" },
+  "author": "Broussen (https://www.broussen.fr)",
   "content_scripts": [
     {
       "matches": ["https://www.youtube.com/*"],
