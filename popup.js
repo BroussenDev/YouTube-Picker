@@ -134,7 +134,7 @@ document.getElementById('go').onclick = () => {
     if (ids.length === 0) return alert("Coche une chaîne !");
     
     const randomId = ids[Math.floor(Math.random() * ids.length)];
-    let url = "https://www.youtube.com/@" + randomId + "/videos?picker=true";
+    let url = "https://www.youtube.com/@" + randomId + "/videos?picker=true&run=true";
     if (filter !== 'all') url += "&maxdate=" + filter;
 
     window.open(url, '_blank');
@@ -145,4 +145,60 @@ function msg(text) {
     toast.innerText = text;
     toast.style.display = 'block';
     setTimeout(() => { toast.style.display = 'none'; }, 2500);
+}
+
+// Fonction pour nettoyer et vérifier la blacklist
+async function getFilteredVideos(allVideos) {
+    const now = Date.now();
+    const oneHour = 60 * 60 * 1000;
+    
+    // 1. Récupérer la blacklist actuelle
+    const data = await chrome.storage.local.get(['videoBlacklist']);
+    let blacklist = data.videoBlacklist || [];
+
+    // 2. Nettoyer les vidéos de plus d'une heure
+    blacklist = blacklist.filter(item => (now - item.timestamp) < oneHour);
+
+    // 3. Filtrer les vidéos récupérées
+    const filtered = allVideos.filter(video => 
+        !blacklist.some(b => b.id === video.id)
+    );
+
+    return { filtered, blacklist };
+}
+
+// Dans ta fonction principale de tirage :
+let attempts = 0;
+const maxAttempts = 3; // On essaie 3 fois de trouver une vidéo hors blacklist
+
+async function pickRandomVideo(allVideos) {
+    const now = Date.now();
+    const oneHour = 60 * 60 * 1000;
+    
+    // 1. Récupérer la blacklist
+    const data = await chrome.storage.local.get(['videoBlacklist']);
+    let blacklist = data.videoBlacklist || [];
+
+    // 2. Nettoyer les vidéos expirées (+ de 1h)
+    blacklist = blacklist.filter(item => (now - item.timestamp) < oneHour);
+
+    // 3. Filtrer les vidéos pour exclure les 10 dernières
+    const filtered = allVideos.filter(video => 
+        !blacklist.some(b => b.id === video.id)
+    );
+
+    // 4. Sélection
+    if (filtered.length > 0) {
+        const selected = filtered[Math.floor(Math.random() * filtered.length)];
+        
+        // Ajouter la nouvelle vidéo et ne garder que les 10 plus récentes
+        blacklist.push({ id: selected.id, timestamp: now });
+        const newBlacklist = blacklist.slice(-10); 
+        
+        await chrome.storage.local.set({ videoBlacklist: newBlacklist });
+        return selected;
+    } else {
+        // Sécurité : si tout est bloqué par la blacklist
+        throw new Error("Toutes les vidéos récentes ont déjà été proposées. Attendez un peu ou ajoutez d'autres créateurs !");
+    }
 }

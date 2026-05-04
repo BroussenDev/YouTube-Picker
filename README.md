@@ -8,7 +8,8 @@
 
 *   **Sélection personnalisée** : Ajoutez vos YouTubeurs via leur @handle (ex: @broussen).
 *   **Filtres d'ancienneté** : Choisissez de ne voir que les vidéos de moins d'un an, 2 ans ou 3 ans.
-*   **Sélection intelligente** : L'algorithme scanne les vidéos récentes de la chaîne et en sélectionne une au hasard.
+*   **Mémoire intelligente (v1.1)** : L'extension se souvient des vidéos proposées et ne vous affichera jamais deux fois la même vidéo durant une heure.
+*   **Sélection aléatoire** : L'algorithme scanne les vidéos récentes et en sélectionne une que vous n'avez pas encore vue.
 *   **Confidentialité totale** : Aucune donnée n'est collectée. Tout est stocké localement dans votre navigateur via `chrome.storage`.
 
 ## 🚀 Installation
@@ -20,7 +21,7 @@
 
 ## 🛠️ Technologies utilisées
 
-*   **JavaScript (ES6+)** : Logique de récupération et filtrage.
+*   **JavaScript (ES6+)** : Logique de récupération, filtrage et gestion de la blacklist.
 *   **Chrome Extension API** : `storage`, `tabs`, `scripting`.
 *   **CSS3** : Interface sombre inspirée du design natif de YouTube.
 
